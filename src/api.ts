@@ -17,14 +17,13 @@ export interface Page<T> {
   last: boolean
 }
 
-export async function fetchTransactions(
-  params: { page?: number; size?: number; sort?: string[] } = {}
-): Promise<Page<Transaction>> {
+export async function fetchTransactions(params: {
+  page?: number; size?: number; sort?: string[]
+} = {}): Promise<Page<Transaction>> {
   const search = new URLSearchParams()
   if (params.page !== undefined) search.set('page', String(params.page))
   if (params.size !== undefined) search.set('size', String(params.size))
   params.sort?.forEach(s => search.append('sort', s))
-
   const res = await fetch(`/api/transactions?${search}`)
   if (!res.ok) throw new Error(`API error: ${res.status}`)
   return res.json()
