@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { fetchTransactions, fetchBalance, type Transaction, type Page } from './api'
 import Pager from './components/Pager'
+import TxForm from './components/TxForm'
 
 export default function App() {
   const [data, setData] = useState<Page<Transaction> | null>(null)
@@ -18,9 +19,7 @@ export default function App() {
         fetchTransactions({ page: p, size, sort }),
         fetchBalance(),
       ])
-      setData(pg)
-      setBalance(bal)
-      setPage(p)
+      setData(pg); setBalance(bal); setPage(p)
     } catch (e: any) {
       setError(e?.message ?? String(e))
     } finally {
@@ -29,20 +28,18 @@ export default function App() {
   }
 
   useEffect(() => { load(0) }, [])
+  useEffect(() => { load(0) }, [sort])
 
   const toggleSort = () => {
-    // date降順↔昇順トグル（例）
-    setSort(prev =>
-      prev[0] === 'date,desc' ? ['date,asc', 'id,asc'] : ['date,desc', 'id,desc']
-    )
+    setSort(prev => prev[0] === 'date,desc' ? ['date,asc','id,asc'] : ['date,desc','id,desc'])
   }
-
-  // sortが変わったら1ページ目から再取得
-  useEffect(() => { load(0) }, [sort])
 
   return (
     <div style={{ maxWidth: 900, margin: '24px auto', fontFamily: 'system-ui, sans-serif' }}>
       <h1>おこづかい管理</h1>
+
+      {/* 登録フォーム（成功したら一覧を1ページ目でリロード） */}
+      <TxForm onSuccess={() => load(0)} />
 
       <div style={{ padding: 12, background: '#f5f5f5', borderRadius: 8, marginBottom: 16 }}>
         <strong>現在の残高：</strong> {balance} 円
